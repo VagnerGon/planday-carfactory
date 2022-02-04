@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CarFactory_Domain;
 using CarFactory_Factory;
 
@@ -30,8 +31,13 @@ namespace CarFactory_Paint
             return car;
         }
 
+        static Dictionary<long, string> knowSolutions;
+
         private static string FindPaintPassword(int passwordLength, long encodedPassword)
         {
+            if (knowSolutions?.TryGetValue(encodedPassword, out var existingSolution) ?? false)
+                return existingSolution;
+
             var rd = new Random();
             string CreateRandomString()
             {
@@ -45,7 +51,15 @@ namespace CarFactory_Paint
                 return new string(chars);
             }
             string str = CreateRandomString();
-            while (PaintJob.EncodeString(str) != encodedPassword) str = CreateRandomString();
+
+            while (PaintJob.EncodeString(str) != encodedPassword) 
+                str = CreateRandomString();
+
+            if (knowSolutions == null)
+                knowSolutions = new();
+
+            knowSolutions.Add(encodedPassword, str);
+
             return str;
         }
     }

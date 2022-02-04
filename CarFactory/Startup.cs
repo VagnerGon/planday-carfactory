@@ -48,7 +48,7 @@ namespace CarFactory
                 {
                     Title = "Car markers API",
                     Version = "v1",
-                    Description = ""
+                    Description = "Create awesome cars"
                 });
             });
 

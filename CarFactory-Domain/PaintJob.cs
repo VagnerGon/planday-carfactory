@@ -23,7 +23,8 @@ namespace CarFactory_Domain
 
         public bool TryUnlockInstructions(string answer)
         {
-            if (AreInstructionsUnlocked()) throw new Exception("Already unlocked");
+            if (AreInstructionsUnlocked())
+                return true;
             IsUnlocked = EncodeString(answer) == EncodeString(Solution);
             return IsUnlocked;
         }
