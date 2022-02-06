@@ -18,15 +18,13 @@ namespace CarFactory_Engine
         private readonly ISteelSubcontractor _steelSubContractor;
         private int SteelInventory = 0;
         private readonly IGetEngineSpecificationQuery _getEngineSpecification;
-        private readonly IMemoryCache _cache;
 
         public EngineProvider(IGetPistons getPistons, ISteelSubcontractor steelSubContractor, 
-            IGetEngineSpecificationQuery getEngineSpecification, IMemoryCache cache)
+            IGetEngineSpecificationQuery getEngineSpecification)
         {
             _getPistons = getPistons;
             _steelSubContractor = steelSubContractor;
             _getEngineSpecification = getEngineSpecification ;
-            _cache = cache;
         }
 
 

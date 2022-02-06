@@ -18,6 +18,7 @@ namespace UnitTests
             var car = new Car(new Chassis("", true), new Engine(new EngineBlock(10),"Test"), new Interior(), new Wheel[4]);
             painter.PaintCar(car, singleColor);
             var job = (SingleColorPaintJob)car.PaintJob;
+
             job.Color.Should().Be(Color.Aqua);
             job.AreInstructionsUnlocked().Should().BeTrue();
         }
