@@ -1,7 +1,10 @@
 ﻿using CarFactory_Domain;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CarFactory_Factory
 {
@@ -33,10 +36,10 @@ namespace CarFactory_Factory
             _storageProvider = storageProvider;
         }
 
-        public IEnumerable<Car> BuildCars(IEnumerable<CarSpecification> specs)
+        public async Task<IEnumerable<Car>> BuildCarsAsync(IEnumerable<CarSpecification> specs)
         {
-            var cars = new List<Car>();
-            foreach(var spec in specs)
+            var cars = new ConcurrentQueue<Car>();
+            var carBuidingTasks = specs.Select(spec => Task.Run(() =>
             {
                 var chassis = _chassisProvider.GetChassis(spec.Manufacturer, spec.NumberOfDoors);
                 var engine = _engineProvider.GetEngine(spec.Manufacturer);
@@ -44,8 +47,9 @@ namespace CarFactory_Factory
                 var wheels = _wheelProvider.GetWheels();
                 var car = _carAssembler.AssembleCar(chassis, engine, interior, wheels);
                 var paintedCar = _painter.PaintCar(car, spec.PaintJob);
-                cars.Add(paintedCar);
-            }
+                cars.Enqueue(paintedCar);
+            }));
+            await Task.WhenAll(carBuidingTasks);
             return cars;
         }
     }

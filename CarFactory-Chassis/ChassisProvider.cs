@@ -15,6 +15,8 @@ namespace CarFactory_Chasis
         private readonly ISteelSubcontractor _steelSubcontractor;
         private readonly IGetChassisRecipeQuery _chassisRecipeQuery;
 
+        private object lockObj = new();
+
         public ChassisProvider(ISteelSubcontractor steelSubcontractor, IGetChassisRecipeQuery chassisRecipeQuery)
         {
             _steelSubcontractor = steelSubcontractor;
@@ -31,10 +33,12 @@ namespace CarFactory_Chasis
 
             CheckChassisParts(chassisParts);
 
-            SteelInventory += _steelSubcontractor.OrderSteel(chassisRecipe.Cost).Select(d => d.Amount).Sum();
-            CheckForMaterials(chassisRecipe.Cost);
-            SteelInventory -= chassisRecipe.Cost;
-
+            lock (lockObj)
+            {
+                SteelInventory += _steelSubcontractor.OrderSteel(chassisRecipe.Cost).Select(d => d.Amount).Sum();
+                CheckForMaterials(chassisRecipe.Cost);
+                SteelInventory -= chassisRecipe.Cost;
+            }
             var chassisWelder = new ChassisWelder();
 
             chassisWelder.StartWeld(chassisParts[0]);

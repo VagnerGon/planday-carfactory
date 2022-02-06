@@ -9,6 +9,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace CarFactory.Controllers
 {
@@ -24,21 +25,21 @@ namespace CarFactory.Controllers
 
         [ProducesResponseType(typeof(BuildCarOutputModel), StatusCodes.Status200OK)]
         [HttpPost]
-        public object Post([FromBody][Required] BuildCarInputModel carsSpecs)
+        public async Task<ActionResult> Post([FromBody][Required] BuildCarInputModel carsSpecs)
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
             var wantedCars = TransformToDomainObjects(carsSpecs);
             
-            var cars = _carFactory.BuildCars(wantedCars);
+            var cars = await _carFactory.BuildCarsAsync(wantedCars);
             stopwatch.Stop();
 
             //Create response and return
-            return new BuildCarOutputModel {
+            return Ok(new BuildCarOutputModel {
                 Cars = cars,
                 RunTime = stopwatch.ElapsedMilliseconds
-            };
+            });
         }
 
         private static IEnumerable<CarSpecification> TransformToDomainObjects(BuildCarInputModel carsSpecs)

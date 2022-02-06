@@ -31,36 +31,41 @@ namespace CarFactory_Paint
             return car;
         }
 
-        static Dictionary<long, string> knowSolutions;
+        Dictionary<long, string> knowSolutions;
 
-        private static string FindPaintPassword(int passwordLength, long encodedPassword)
+        object lockObj = new();
+
+        // Not static since secret will be the same for the Painter instance, thus the lock will be acquired only for each Paint type
+        private string FindPaintPassword(int passwordLength, long encodedPassword)
         {
-            if (knowSolutions?.TryGetValue(encodedPassword, out var existingSolution) ?? false)
-                return existingSolution;
-
-            var rd = new Random();
-            string CreateRandomString()
+            lock (lockObj)
             {
-                char[] chars = new char[passwordLength];
+                if (knowSolutions?.TryGetValue(encodedPassword, out var existingSolution) ?? false)
+                    return existingSolution;
 
-                for (int i = 0; i < passwordLength; i++)
+                var rd = new Random();
+                string CreateRandomString()
                 {
-                    chars[i] = PaintJob.ALLOWED_CHARACTERS[rd.Next(0, PaintJob.ALLOWED_CHARACTERS.Length)];
+                    char[] chars = new char[passwordLength];
+
+                    for (int i = 0; i < passwordLength; i++)
+                    {
+                        chars[i] = PaintJob.ALLOWED_CHARACTERS[rd.Next(0, PaintJob.ALLOWED_CHARACTERS.Length)];
+                    }
+
+                    return new string(chars);
                 }
+                string str = CreateRandomString();
 
-                return new string(chars);
+                while (PaintJob.EncodeString(str) != encodedPassword)
+                    str = CreateRandomString();
+
+                if (knowSolutions == null)
+                    knowSolutions = new();
+
+                knowSolutions.Add(encodedPassword, str);
+                return str;
             }
-            string str = CreateRandomString();
-
-            while (PaintJob.EncodeString(str) != encodedPassword) 
-                str = CreateRandomString();
-
-            if (knowSolutions == null)
-                knowSolutions = new();
-
-            knowSolutions.Add(encodedPassword, str);
-
-            return str;
         }
     }
 }
