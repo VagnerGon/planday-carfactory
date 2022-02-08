@@ -31,6 +31,7 @@ namespace CarFactory.Controllers.ViewModel
         public CarPaintSpecificationInputModel Paint { get; set; }
         public Manufacturer Manufacturer { get; set; }
         public SpeakerSpecificationInputModel[] FrontWindowSpeakers { get; set; }
+        public SpeakerSpecificationInputModel[] DoorWindowSpeakers { get; set; }
     }
 
     public class SpeakerSpecificationInputModel
