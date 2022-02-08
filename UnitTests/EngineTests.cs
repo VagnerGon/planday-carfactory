@@ -22,6 +22,8 @@ namespace UnitTests
 
         private Manufacturer manufacturer = Manufacturer.Plandrover;
 
+        private const int pistonCount = 4;
+
         public EngineTests()
         {
             var pistonsMoq = new Mock<IGetPistons>();
@@ -42,7 +44,7 @@ namespace UnitTests
 
             engineSpecsMoq.Setup(m => m.GetForManufacturer(manufacturer)).Returns(new CarFactory_Domain.Engine.EngineSpecifications.EngineSpecification
             {
-                CylinderCount = 4,
+                CylinderCount = pistonCount,
                 Name = "Sigma",
                 PropulsionType = Propulsion.Gasoline
             });
@@ -56,8 +58,8 @@ namespace UnitTests
             Assert.IsNotNull(_engineProvider);
             var engine = _engineProvider.GetEngine(Manufacturer.Plandrover);
 
-            engine.EngineBlock.CylinderCount.Should().Be(4);
-            engine.PistonsCount.Should().Be(4);
+            engine.EngineBlock.CylinderCount.Should().Be(pistonCount);
+            engine.PistonsCount.Should().Be(pistonCount);
 
             engine.HasSparkPlugs.Should().BeTrue();
 
